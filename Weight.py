@@ -9,3 +9,6 @@ class Weight(object):
         pass
     def mutateGen(self):
         pass
+    @staticmethod
+    def random(self):
+        pass

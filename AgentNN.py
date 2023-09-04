@@ -46,7 +46,6 @@ class AgentNN(object):
         :param data: input: (1, 4)
         :return: predict int
         """
-
         self.model.predict()
 
     @staticmethod
