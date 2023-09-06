@@ -81,7 +81,7 @@ class AgentNN(object):
         offset, rotation = self.get_best(piece, field)
 
         moves = []
-
+        print(offset)
         offset = offset - offsetX
         for _ in range(0, rotation):
             moves.append("UP")

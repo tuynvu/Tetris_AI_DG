@@ -2,10 +2,17 @@ import os
 from keras.models import Sequential
 from keras.layers import Dense, Layer, Flatten
 from keras.optimizers import Adam
+import tensorflow as tf
+import keras
 from collections import deque
 import numpy as np
 from field import Field
 from setting import *
+
+def rotate_clockwise(shape):
+    return [ [ shape[y][x]
+            for y in range(len(shape)) ]
+        for x in range(len(shape[0]) - 1, -1, -1) ]
 
 class AgentNN(object):
     def __init__(self, input_shape, optimizer=Adam, loss="mse",
@@ -20,7 +27,7 @@ class AgentNN(object):
         self.model = self.createModel()
 
     def createModel(self):
-
+        tf.random.set_seed(42)
         model = Sequential()
         model.add(Flatten(input_shape=self.input_shape))
         model.add(Dense(units=self.dimenson[0], activation=self.activation[0]))
@@ -66,22 +73,27 @@ class AgentNN(object):
                 result = field.projectPieceDown(piece, offset, 1)
                 if result is not None:
                     heuristics = field.heuristics()
-                    score = self.get_predict(heuristics)
+                    score = self.get_predict(heuristics)[0]
+                    print(score)
                     if score_max is None or score > score_max:
+                        print("check", offset)
                         score_max = score
                         offetX = offset
                         rotate_rt = rotate
+                field.undo(1)
+            rotate_clockwise(piece)
 
         return offetX, rotate_rt
 
     def choose(self, grid, piece, offsetX, parent):
-        field =  Field(len(piece[0]), len(piece))
+        field = Field(len(piece[0]), len(piece))
         field.updateField(grid)
 
         offset, rotation = self.get_best(piece, field)
 
         moves = []
 
+        print("offfset: ",offset)
         offset = offset - offsetX
         for _ in range(0, rotation):
             moves.append("UP")
