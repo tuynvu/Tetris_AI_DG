@@ -13,3 +13,5 @@
     * Nghe có vẻ phức tạp
 ## Đánh giá
     
+## Tham Khảo
+    * env [tại đây](https://github.com/fthomasmorel/Tetris-AI) 
