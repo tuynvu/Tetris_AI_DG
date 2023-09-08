@@ -71,7 +71,7 @@ class Geneticnn(object):
 
     def genRemain(self, nremain, nbestgen):
         remainGen = []
-        for gen in range(remainGen):
+        for gen in range(nremain):
             if np.random.rand() > 0.4:
                 remainGen.append(self.mutateGen(random.choice(nbestgen)))
             else:
@@ -80,7 +80,7 @@ class Geneticnn(object):
     def trainGeneticNN(self, episode):
         gen = self.genPopulations()
         for epoch in tqdm(range(self.epochs)):
-            listAgnt: list(tuple(AgentNN, int)) = []
+            listAgnt: list[tuple[AgentNN, int]] = []
             for idiv in gen:
                 score = self.getFitness(idiv)
                 listAgnt.append((idiv, score))
