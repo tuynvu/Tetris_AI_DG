@@ -38,6 +38,12 @@ class AgentNN(object):
         print(model.summary())
         return model
 
+    def getWeight(self):
+        """
+        :return: list[array()]
+        """
+        return self.model.get_weights()
+
     def update_weight(self, weight):
         """
         :param weight: list[np.array()]

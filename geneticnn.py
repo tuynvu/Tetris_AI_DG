@@ -12,6 +12,7 @@ EPSILON = 0.6
 NBESTPPOPULATION = 30
 ROUNDS = 4
 LIMITPIECE = 200
+RANDOM_NWEIGHT = 3
 
 def cmp(a, b):
     if a < b: return 1
@@ -49,16 +50,49 @@ class Geneticnn(object):
         """
         return listAgent.sort(key=cmp_to_key(mycmp=cmp))[:NBESTPPOPULATION]
 
-    def excuteCross(self,indv1, indv2) -> AgentNN:
-        pass
+    def excuteCross(self,indv1: AgentNN, indv2: AgentNN) -> list[AgentNN]:
+        weight1 = indv1.getWeight()
+        weight2 = indv2.getWeight()
+
+        for i in range(np.random.randint(RANDOM_NWEIGHT)):
+            if np.random.rand() > 0.3:
+                idx = np.random.randint(len(weight1))
+                weight1, weight2 = weight1[:idx] + weight2[idx:], weight2[:idx] + weight1[idx:]
+
+        return [AgentNN(INPUT_SHAPE).update_weight(weight1), AgentNN(INPUT_SHAPE).update_weight(weight2)]
+
     def crossGen(self, indv1, indv2):
         if np.random.rand() > 0.4:
             return self.excuteCross(indv1, indv2)
         else:
-            return self.genIndv()
+            return [self.genIndv(), self.genIndv()]
 
-    def excuteMutate(self, indv):
-        pass
+    def excuteMutate(self, indv: AgentNN):
+        """
+        :param indv:
+        :return: AgentNN
+        """
+        agent = AgentNN(input_shape=INPUT_SHAPE)
+        weight = indv.getWeight()
+        for i in range(np.random.randint(RANDOM_NWEIGHT)):
+            if np.random.rand() > 0.3:
+                idx = np.random.randint(len(weight))
+                array = weight[idx].copy()
+                if idx % 2 == 0:
+                    colUP, colDown = sorted(list(random.choices(np.arange(len(array)), k=2)))
+                    rowLeft, rowRight = sorted(list(random.choices(np.arange(len(array[0])), k=2)))
+                    sample = np.random.rand(rowRight - rowLeft + 1, colDown - colUP + 1)
+                    array[rowRight - rowLeft + 1, colDown - colUP + 1] = sample
+                else:
+                    pass
+            else:
+                idx = np.random.randint(len(weight))
+                sample = np.random.rand(len(weight[idx][0]), len(weight[idx]))
+                weight[idx] = sample
+
+        agent.update_weight(weight)
+
+        return agent
 
     def mutateGen(self, indv):
         if np.random.rand() > 0.5:
@@ -75,7 +109,8 @@ class Geneticnn(object):
             if np.random.rand() > 0.4:
                 remainGen.append(self.mutateGen(random.choice(nbestgen)))
             else:
-                remainGen.append(self.crossGen(*random.choices(nbestgen, k=2)))
+                remainGen.extend(self.crossGen(*random.choices(nbestgen, k=2)))
+        return remainGen
 
     def trainGeneticNN(self, episode):
         gen = self.genPopulations()
