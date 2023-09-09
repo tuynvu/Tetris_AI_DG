@@ -9,14 +9,16 @@ import numpy as np
 from field import Field
 from setting import *
 
+
 def rotate_clockwise(shape):
-    return [ [ shape[y][x]
-            for y in range(len(shape)) ]
-        for x in range(len(shape[0]) - 1, -1, -1) ]
+    return [[shape[y][x]
+             for y in range(len(shape))]
+            for x in range(len(shape[0]) - 1, -1, -1)]
+
 
 class AgentNN(object):
     def __init__(self, input_shape, optimizer=Adam, loss="mse",
-                 learning_rate=0.1, activation=["relu", "relu", "linear"], dimenson=[64, 64]):
+                 learning_rate=0.1, activation=("relu", "relu", "linear"), dimenson=(64, 64)):
         self.input_shape = input_shape
         self.optimizer = optimizer
         self.loss = loss
@@ -66,14 +68,13 @@ class AgentNN(object):
         """
         :param self: AgentNN
         :param piece: list[list[]]
-        :param offsetX: int
         :param field: grid
         :return: int, int
         """
         rotate_nb = {4: 4, 8: 2, 12: 2, 16: 4, 20: 4, 24: 2, 28: 1}
         offetX = None
         rotate_rt = None
-        score_max =None
+        score_max = None
         for rotate in range(rotate_nb[np.sum(piece)]):
             for offset in range(field.width):
                 result = field.projectPieceDown(piece, offset, 1)
@@ -99,7 +100,7 @@ class AgentNN(object):
 
         moves = []
 
-        print("offfset: ",offset)
+        print("offfset: ", offset)
         offset = offset - offsetX
         for _ in range(0, rotation):
             moves.append("UP")

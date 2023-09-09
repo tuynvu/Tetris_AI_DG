@@ -6,8 +6,8 @@ import tensorflow as tf
 import keras
 from collections import deque
 import numpy as np
-from field import Field
-from setting import *
+from Env.field import Field
+from Env.setting import *
 
 
 def rotate_clockwise(shape):
@@ -18,7 +18,7 @@ def rotate_clockwise(shape):
 
 class AgentNN(object):
     def __init__(self, input_shape, optimizer=Adam, loss="mse",
-                 learning_rate=0.1, activation=["relu", "relu", "linear"], dimenson=[64, 64]):
+                 learning_rate=0.1, activation=("relu", "relu", "linear"), dimenson=(64, 64)):
         self.input_shape = input_shape
         self.optimizer = optimizer
         self.loss = loss
@@ -68,7 +68,6 @@ class AgentNN(object):
         """
         :param self: AgentNN
         :param piece: list[list[]]
-        :param offsetX: int
         :param field: grid
         :return: int, int
         """
