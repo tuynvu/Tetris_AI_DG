@@ -40,7 +40,7 @@ class Geneticnn(object):
         """
         score = 0
         for round in range(ROUNDS):
-            score += TetrisApp(playWithUI=True, seed=42, Ai=indv).run(LIMITPIECE)
+            score += TetrisApp(playWithUI=True, seed=np.random.randint(1, 100000), Ai=indv).run(LIMITPIECE)
         return score
 
     def getBestNPopulation(self, listAgent):

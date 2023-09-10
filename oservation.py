@@ -4,13 +4,13 @@ class Oservation(object):
         pass
 
     @staticmethod
-    def get_piece_current(self):
+    def get_piece_current(self, ob):
         pass
 
     @staticmethod
-    def get_next_piece(self):
+    def get_next_piece(self, ob):
         pass
 
     @staticmethod
-    def get_grid(self):
+    def get_grid(self, ob):
         pass

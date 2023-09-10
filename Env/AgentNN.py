@@ -16,6 +16,7 @@ def rotate_clockwise(shape):
             for x in range(len(shape[0]) - 1, -1, -1)]
 
 
+
 class AgentNN(object):
     def __init__(self, input_shape, optimizer=Adam, loss="mse",
                  learning_rate=0.1, activation=("relu", "relu", "linear"), dimenson=(64, 64)):
