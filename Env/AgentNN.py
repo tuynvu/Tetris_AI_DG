@@ -65,7 +65,7 @@ class AgentNN(object):
         """
         return self.model.predict(np.array(data).reshape(1, 4))[0]
 
-    def get_best(self, piece, field):
+    def get_best(self, piece, field, id, idPiece):
         """
         :param self: AgentNN
         :param piece: list[list[]]
@@ -76,22 +76,25 @@ class AgentNN(object):
         offetX = None
         rotate_rt = None
         score_max = None
-        for rotate in range(rotate_nb[np.sum(piece)]):
+        for rotate in range(rotate_nb[np.sum(piece[idPiece])]):
             for offset in range(field.width):
-                result = field.projectPieceDown(piece, offset, 1)
+                result = field.projectPieceDown(piece[idPiece], offset, id)
                 if result is not None:
-                    heuristics = field.heuristics()
-                    score = self.get_predict(heuristics)[0]
-                    print(score)
+                    if len(piece) - 1 == idPiece - 1:
+                        heuristics = field.heuristics()
+                        score = self.get_predict(heuristics)[0]
+                    else:
+                        _, _, score = self.get_best(piece, field, id + 1, idPiece + 1)
+
                     if score_max is None or score > score_max:
                         print("check", offset)
                         score_max = score
                         offetX = offset
                         rotate_rt = rotate
-                field.undo(1)
+                field.undo(id)
             rotate_clockwise(piece)
 
-        return offetX, rotate_rt
+        return offetX, rotate_rt, score_max
 
     def choose(self, grid, piece, offsetX, parent):
         field = Field(len(piece[0]), len(piece))
