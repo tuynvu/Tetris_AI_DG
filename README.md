@@ -16,7 +16,7 @@
     và từ đó lặp lại ta sẽ tạo ra con Agent chs được game tetris
 
 ## Đánh giá
-    * Mô hình học sâu kết hợp genetic
+    Mô hình học sâu kết hợp genetic
 ## Tham Khảo
 * [Env](https://github.com/fthomasmorel/Tetris-AI)
 * [Env1](https://github.com/ylsung/TetrisBattle.git)
