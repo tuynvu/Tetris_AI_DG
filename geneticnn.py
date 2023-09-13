@@ -48,7 +48,7 @@ class Geneticnn(object):
         :param listAgent: list[(AgentNN, score)]
         :return: list[AgentNN]
         """
-        return listAgent.sort(key=cmp_to_key(mycmp=cmp))[:NBESTPPOPULATION]
+        return sorted(listAgent, key=cmp_to_key(mycmp=cmp))[:NBESTPPOPULATION]
 
     def excuteCross(self,indv1: AgentNN, indv2: AgentNN) -> list[AgentNN]:
         weight1 = indv1.getWeight()
