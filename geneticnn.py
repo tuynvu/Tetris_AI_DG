@@ -6,7 +6,7 @@ import random
 
 INPUT_SHAPE = 4, 1
 EPSILON = 0.6
-NBESTPPOPULATION = 5
+NBESTPPOPULATION = 2
 ROUNDS = 4
 LIMITPIECE = 200
 RANDOM_NWEIGHT = 3
@@ -76,7 +76,8 @@ class Geneticnn(object):
             if np.random.rand() > 0.3:
                 idx = np.random.randint(len(weight))
                 array = weight[idx].copy()
-                if idx % 2 == 0:
+                if idx % 2 == 0 and len(array.shape) == 2:
+                    print(array)
                     colUP, colDown = sorted(list(random.choices(np.arange(len(array)), k=2)))
                     rowLeft, rowRight = sorted(list(random.choices(np.arange(len(array[0])), k=2)))
                     sample = np.random.rand(rowRight - rowLeft + 1, colDown - colUP + 1)
@@ -85,9 +86,10 @@ class Geneticnn(object):
                     pass
             else:
                 idx = np.random.randint(len(weight))
-                sample = np.random.rand(len(weight[idx][0]), len(weight[idx]))
-                weight[idx] = sample
-
+                if len(weight[idx].shape) == 2:
+                    sample = np.random.rand(len(weight[idx][0]), len(weight[idx]))
+                    weight[idx] = sample
+        print(weight)
         agent.update_weight(weight)
 
         return agent
@@ -113,19 +115,20 @@ class Geneticnn(object):
     def trainGeneticNN(self):
         gen = self.genPopulations()
         for epoch in tqdm(range(self.epochs)):
-            print(f"epoch: {epoch}/{self.epochs}")
+            print()
             listAgnt: list[tuple[AgentNN, int]] = []
             for idx, idiv in enumerate(gen):
                 print(f"indv: {idx}/{len(gen)}")
                 score = self.getFitness(idiv)
                 listAgnt.append((idiv, score))
-                print(listAgnt[-1])
+                # print(listAgnt[-1][1], np.array(listAgnt[-1][0].getWeight()).flatten())
+                print(listAgnt[-1][1])
 
-            bestPop = self.getBestNPopulation(listAgnt)
+            bestPop = list(self.getBestNPopulation(listAgnt))
             print(bestPop)
             gen = deepcopy(bestPop)
             gen.extend(self.genRemain(self.population - NBESTPPOPULATION, bestPop))
 
 
-DG = Geneticnn(population=20, epochs=5 , limit_piece=200, epsilon=0.5)
+DG = Geneticnn(population=5, epochs=5 , limit_piece=200, epsilon=0.5)
 DG.trainGeneticNN()

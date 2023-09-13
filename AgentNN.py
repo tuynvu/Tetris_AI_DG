@@ -60,7 +60,7 @@ class AgentNN(object):
         :param data: input: list have dim (1, 4)
         :return: predict int
         """
-        return self.model.predict(np.array(data).reshape(1, 4))[0]
+        return self.model.predict(np.array(data).reshape(1, 4), verbose=0)[0]
 
     def get_best(self, piece, field, id, idPiece):
         """
