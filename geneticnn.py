@@ -1,21 +1,18 @@
-from Weight import Weight
 from tqdm import tqdm
-from AgentNN import AgentNN
 from functools import cmp_to_key
 from copy import deepcopy
-from Env.tetris import TetrisApp
 import numpy as np
 import random
 
 INPUT_SHAPE = 4, 1
 EPSILON = 0.6
-NBESTPPOPULATION = 30
+NBESTPPOPULATION = 5
 ROUNDS = 4
 LIMITPIECE = 200
 RANDOM_NWEIGHT = 3
 
 def cmp(a, b):
-    if a < b: return 1
+    if a[1] < b[1]: return 1
     else: return -1
 
 class Geneticnn(object):
@@ -24,6 +21,7 @@ class Geneticnn(object):
         self.limit_piece = limit_piece
         self.epsilon = epsilon
         self.population = population
+
     def genIndv(self):
         return AgentNN(input_shape=INPUT_SHAPE)
 
@@ -40,7 +38,7 @@ class Geneticnn(object):
         """
         score = 0
         for round in range(ROUNDS):
-            score += TetrisApp(playWithUI=True, seed=np.random.randint(1, 100000), Ai=indv).run(LIMITPIECE)
+            score += TetrisApp(playWithUI=False, seed=np.random.randint(1, 100000), Ai=indv).run(LIMITPIECE)
         return score
 
     def getBestNPopulation(self, listAgent):
@@ -48,7 +46,7 @@ class Geneticnn(object):
         :param listAgent: list[(AgentNN, score)]
         :return: list[AgentNN]
         """
-        return sorted(listAgent, key=cmp_to_key(mycmp=cmp))[:NBESTPPOPULATION]
+        return list(zip(*(sorted(listAgent, key=cmp_to_key(mycmp=cmp))[:NBESTPPOPULATION])))[0]
 
     def excuteCross(self,indv1: AgentNN, indv2: AgentNN) -> list[AgentNN]:
         weight1 = indv1.getWeight()
@@ -129,3 +127,5 @@ class Geneticnn(object):
             gen.extend(self.genRemain(self.population - NBESTPPOPULATION, bestPop))
 
 
+DG = Geneticnn(population=20, epochs=5 , limit_piece=200, epsilon=0.5)
+DG.trainGeneticNN()
