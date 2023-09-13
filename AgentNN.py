@@ -6,8 +6,6 @@ import tensorflow as tf
 import keras
 from collections import deque
 import numpy as np
-from Env.field import Field
-from Env.setting import *
 
 
 def rotate_clockwise(shape):
@@ -37,7 +35,7 @@ class AgentNN(object):
         model.add(Dense(units=1, activation=self.activation[2]))
 
         model.compile(loss=self.loss, optimizer=self.optimizer(learning_rate=self.learning_rate, name="Adam"))
-        print(model.summary())
+        # print(model.summary())
         return model
 
     def getWeight(self):
@@ -75,31 +73,32 @@ class AgentNN(object):
         offetX = None
         rotate_rt = None
         score_max = None
-        for rotate in range(rotate_nb[np.sum(piece[idPiece])]):
+        piece_crr = piece[idPiece]
+        for rotate in range(rotate_nb[np.sum(piece_crr)]):
             for offset in range(field.width):
                 result = field.projectPieceDown(piece[idPiece], offset, id)
                 if result is not None:
-                    if len(piece) - 1 == idPiece - 1:
+                    if len(piece) - 1 == idPiece:
                         heuristics = field.heuristics()
                         score = self.get_predict(heuristics)[0]
                     else:
                         _, _, score = self.get_best(piece, field, id + 1, idPiece + 1)
 
                     if score_max is None or score > score_max:
-                        print("check", offset)
+                        # print("check", offset)
                         score_max = score
                         offetX = offset
                         rotate_rt = rotate
                 field.undo(id)
-            rotate_clockwise(piece)
+            piece_crr = rotate_clockwise(copy.deepcopy(piece_crr))
 
         return offetX, rotate_rt, score_max
 
-    def choose(self, grid, piece, offsetX, parent):
+    def choose(self, grid, piece, nextPiece, offsetX, parent):
         field = Field(len(piece[0]), len(piece))
         field.updateField(grid)
 
-        offset, rotation = self.get_best(piece, field)
+        offset, rotation, _ = self.get_best([piece, nextPiece], field, 1, 0)
 
         moves = []
 

@@ -112,16 +112,20 @@ class Geneticnn(object):
                 remainGen.extend(self.crossGen(*random.choices(nbestgen, k=2)))
         return remainGen
 
-    def trainGeneticNN(self, episode):
+    def trainGeneticNN(self):
         gen = self.genPopulations()
         for epoch in tqdm(range(self.epochs)):
+            print(f"epoch: {epoch}/{self.epochs}")
             listAgnt: list[tuple[AgentNN, int]] = []
-            for idiv in gen:
+            for idx, idiv in enumerate(gen):
+                print(f"indv: {idx}/{len(gen)}")
                 score = self.getFitness(idiv)
                 listAgnt.append((idiv, score))
+                print(listAgnt[-1])
 
             bestPop = self.getBestNPopulation(listAgnt)
-
+            print(bestPop)
             gen = deepcopy(bestPop)
             gen.extend(self.genRemain(self.population - NBESTPPOPULATION, bestPop))
+
 
