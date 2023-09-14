@@ -1,20 +1,15 @@
 import os
 from keras.models import Sequential
-from keras.layers import Dense, Layer, Flatten
+from keras.layers import Dense, Flatten
 from keras.optimizers import Adam
 import tensorflow as tf
-import keras
-from collections import deque
-import numpy as np
-from field import Field
-from setting import *
-
-
+# import numpy as np
+# import copy
+from field import *
 def rotate_clockwise(shape):
     return [[shape[y][x]
              for y in range(len(shape))]
             for x in range(len(shape[0]) - 1, -1, -1)]
-
 
 
 class AgentNN(object):
@@ -38,7 +33,7 @@ class AgentNN(object):
         model.add(Dense(units=1, activation=self.activation[2]))
 
         model.compile(loss=self.loss, optimizer=self.optimizer(learning_rate=self.learning_rate, name="Adam"))
-        print(model.summary())
+        # print(model.summary())
         return model
 
     def getWeight(self):
@@ -63,7 +58,7 @@ class AgentNN(object):
         :param data: input: list have dim (1, 4)
         :return: predict int
         """
-        return self.model.predict(np.array(data).reshape(1, 4))[0]
+        return self.model.predict(np.array(data).reshape(1, 4), verbose=0)[0]
 
     def get_best(self, piece, field, id, idPiece):
         """
@@ -76,31 +71,32 @@ class AgentNN(object):
         offetX = None
         rotate_rt = None
         score_max = None
-        for rotate in range(rotate_nb[np.sum(piece[idPiece])]):
+        piece_crr = piece[idPiece]
+        for rotate in range(rotate_nb[np.sum(piece_crr)]):
             for offset in range(field.width):
-                result = field.projectPieceDown(piece[idPiece], offset, id)
+                result = field.projectPieceDown(piece_crr, offset, id)
                 if result is not None:
-                    if len(piece) - 1 == idPiece - 1:
+                    if len(piece) - 1 == idPiece:
                         heuristics = field.heuristics()
                         score = self.get_predict(heuristics)[0]
                     else:
                         _, _, score = self.get_best(piece, field, id + 1, idPiece + 1)
 
                     if score_max is None or score > score_max:
-                        print("check", offset)
+                        # print("check", offset)
                         score_max = score
                         offetX = offset
                         rotate_rt = rotate
                 field.undo(id)
-            rotate_clockwise(piece)
+            piece_crr = rotate_clockwise(copy.deepcopy(piece_crr))
 
         return offetX, rotate_rt, score_max
 
-    def choose(self, grid, piece, offsetX, parent):
-        field = Field(len(piece[0]), len(piece))
+    def choose(self, grid, piece, nextPiece, offsetX, parent):
+        field = Field(len(grid[0]), len(grid))
         field.updateField(grid)
-
-        offset, rotation = self.get_best(piece, field)
+        print("check")
+        offset, rotation, _ = self.get_best([piece, nextPiece], field, 1, 0)
 
         moves = []
 
@@ -114,4 +110,5 @@ class AgentNN(object):
             else:
                 moves.append("LEFT")
         # moves.append('RETURN')
+        print(moves)
         parent.executes_moves(moves)

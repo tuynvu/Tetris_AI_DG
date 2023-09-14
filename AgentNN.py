@@ -1,12 +1,11 @@
 import os
 from keras.models import Sequential
-from keras.layers import Dense, Layer, Flatten
+from keras.layers import Dense, Flatten
 from keras.optimizers import Adam
 import tensorflow as tf
-import keras
-from collections import deque
 import numpy as np
-
+import copy
+from Env.field import Field
 
 def rotate_clockwise(shape):
     return [[shape[y][x]
@@ -76,7 +75,7 @@ class AgentNN(object):
         piece_crr = piece[idPiece]
         for rotate in range(rotate_nb[np.sum(piece_crr)]):
             for offset in range(field.width):
-                result = field.projectPieceDown(piece[idPiece], offset, id)
+                result = field.projectPieceDown(piece_crr, offset, id)
                 if result is not None:
                     if len(piece) - 1 == idPiece:
                         heuristics = field.heuristics()
@@ -95,7 +94,7 @@ class AgentNN(object):
         return offetX, rotate_rt, score_max
 
     def choose(self, grid, piece, nextPiece, offsetX, parent):
-        field = Field(len(piece[0]), len(piece))
+        field = Field(len(grid[0]), len(grid))
         field.updateField(grid)
 
         offset, rotation, _ = self.get_best([piece, nextPiece], field, 1, 0)
